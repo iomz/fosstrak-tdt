@@ -19,6 +19,7 @@
  */
 
 package org.fosstrak.tdt;
+import java.net.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
