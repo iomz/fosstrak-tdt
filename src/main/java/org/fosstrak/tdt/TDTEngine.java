@@ -962,14 +962,20 @@ public class TDTEngine {
 		debugprintln(tdttagurilevel.getPrefixMatch().toString());
 		
 		
+		
 		Option tdtoutoption = findOption(tdtoutlevel, optionValue);
+	    
 		
 		debugprint("tdtoutoption pattern = ");
-		if (tdtoutoption.getPattern() != null) {
-		debugprintln(tdtoutoption.getPattern().toString());
-		} else {
-			debugprintln("null");	
-		}
+	    try {  // 2015.jan.19 jm to suppress tdtoutoption = null
+		  if (tdtoutoption.getPattern() != null) {
+		     debugprintln(tdtoutoption.getPattern().toString());
+		  } else {
+			 debugprintln("null");	
+		    }
+	      } catch(NullPointerException e){
+	     debugprint("option null\n");
+	   }
 			
 		Option tdttagurioption = findOption(tdttagurilevel, optionValue);
 		Option tdtbinaryoption = findOption(tdtbinarylevel, optionValue);
@@ -2499,7 +2505,7 @@ return rawhex.toString();
 		}
 		if (option == null) {
 			debugprintln("***ERROR: Couldn't find option for " + optionKey + " in level " + level);
-			throw new Error("Couldn't find option for " + optionKey + " in level " + level);
+			//throw new Error("Couldn't find option for " + optionKey + " in level " + level);
 		}
 		return option;
 	}
