@@ -260,6 +260,38 @@ public class TDTEngine {
 		}
 		loadGEPC64Table(unmar, auxiliary);
 	}
+	/**
+	 * Constructor for a new Tag Data Translation engine. All files are
+	 * unmarshalled using JAXB.
+	 * 
+	 * @param auxiliary
+	 *            URL to the auxiliary file containing a GEPC64Table
+	 * @param schemes
+	 *            directory containing the schemes, all files ending in xml are
+	 *            read and parsed
+	 * @param isoafis; collection of ISO afi
+	 * @throws IOException
+	 *             thrown if the url is unreachable
+	 * @throws JAXBException
+	 *             thrown if the files could not be parsed
+	 */
+	public TDTEngine(URL auxiliary, URL schemes, URL isoafis) throws IOException,
+			JAXBException {
+		Unmarshaller unmar = getUnmarshaller();
+		URLConnection urlcon = schemes.openConnection();
+		urlcon.connect();
+		BufferedReader in = new BufferedReader(new InputStreamReader(urlcon
+				.getInputStream()));
+		String line;
+		for (; (line = in.readLine()) != null;) {
+			if (line.endsWith(".xml")) {
+				loadEpcTagDataTranslation(unmar, new URL(schemes.toString()
+						+ line));
+			}
+		}
+		loadGEPC64Table(unmar, auxiliary);
+	}
+
 
 	/**
 	 * Constructor for a new Tag Data Translation engine. All files are
@@ -769,6 +801,50 @@ public class TDTEngine {
 
 
 		return convertLevel(match.getScheme(), match.getLevel(), input, inputParameters, outputLevel);
+	}
+	/**
+	 * Translates the input string of a specified input level to a specified
+	 * including ISO standard
+	 * 
+	 * <p>
+	 * Note that this version of the method requires that the user specify the
+	 * input level, rather than searching for it. However it still automatically
+	 * finds the scheme used.
+	 * </p>
+	 * 
+	 * @param input
+	 *            input tag in Binary
+	 * @param nsi
+	 *            nsi
+	 * @param afi
+	 * 	          afi
+	 * @param tagLength
+
+	 */
+	public String convert(String input, String hx, Map<String, String> suppliedInputParameters, 
+		    String nsi, String afi, String tagLength,LevelTypeList outputLevel ) {
+
+		debugprintln("convert (line 748)");
+		debugprintln("===============================================");
+		debugprintln("CONVERT "+input+" to "+outputLevel.toString());
+
+		String decodedinput;
+		String encoded;
+		
+		// GS1keys
+		if (nsi.equals("0") & tagLength.equals("96")){
+			suppliedInputParameters.put("tagLength", "96");
+			String id = new String(this.convert(input, suppliedInputParameters, outputLevel));
+			return id; 
+		}
+		// ISO keys
+		else if (nsi.equals("1")){
+		  //String tmp = new String("URN:ISO.1552"+hx); 
+		  return ("URN:ISO.15459."+hx);
+		}
+		else {
+		  return (null); 
+		}
 	}
 
 	/**
