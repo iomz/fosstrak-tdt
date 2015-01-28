@@ -828,14 +828,11 @@ public class TDTEngine {
 		debugprintln("===============================================");
 		debugprintln("CONVERT "+input+" to "+outputLevel.toString());
 
-		String decodedinput;
-		String encoded;
 		
 		// GS1keys
 		if (nsi.equals("0") & tagLength.equals("96")){
-			suppliedInputParameters.put("tagLength", "96");
-			String id = new String(this.convert(input, suppliedInputParameters, outputLevel));
-			return id; 
+			suppliedInputParameters.put("taglength", "96");
+			return this.convert(input, suppliedInputParameters, outputLevel);
 		}
 		// ISO keys
 		else if (nsi.equals("1")){
