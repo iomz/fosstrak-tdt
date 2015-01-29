@@ -836,12 +836,68 @@ public class TDTEngine {
 		}
 		// ISO keys
 		else if (nsi.equals("1")){
-		  //String tmp = new String("URN:ISO.1552"+hx); 
-		  return ("URN:ISO.15459."+hx);
+		  //String tmp = new String("URN:ISO.1552"+hx);
+		  return       isoTDT(afi, tagLength, input);
 		}
 		else {
 		  return (null); 
 		}
+	}
+	public String isoTDT(String afi, String tagLength, String input){
+		String isoUrn = "URN:OID:";
+		String parse6Hex = null; 
+		int afiInt = new Integer(afi); 
+		switch (afiInt){
+		   case 161:
+			   isoUrn = isoUrn+"1.0.17367:";
+			   break; 
+		   case 162:
+			   isoUrn = isoUrn+"1.0.17365:";
+			   break; 
+		   case 163:
+			   isoUrn = isoUrn+"1.0.17364:";
+			   break; 
+		   case 164:
+			   isoUrn = isoUrn+"1.0.17367:";
+			   break; 
+		   case 165:
+			   isoUrn = isoUrn+"1.0.17366:";
+			   break; 
+		   case 166:
+			   isoUrn = isoUrn+"1.0.17366:";
+			   break; 
+		   case 167:
+			   isoUrn = isoUrn+"1.0.17365:";
+			   break; 
+		   case 168:
+			   isoUrn = isoUrn+"1.0.17364:";
+			   break; 
+		   case 169:
+			   isoUrn = isoUrn+"1.0.17363:";
+			   break; 
+		   case 170: 
+			   isoUrn = isoUrn+"1.0.17363:";
+			   break; 
+			default:
+			   break;
+		}
+		parse6Hex = parse6HexIso(input, tagLength); 
+		isoUrn = isoUrn + parse6Hex; 
+		return isoUrn; 
+	}
+	public String parse6HexIso(String input, String tagLength){
+		String tmp=null;
+		StringBuilder code = new StringBuilder(); 
+		int    tmpInt; 
+		for (int i=0; i<Integer.parseInt(tagLength)/6; i++){
+			tmp = input.substring(i*6, i*6+6);
+			tmpInt = Short.parseShort(tmp.substring(0,1))*32+Short.parseShort(tmp.substring(1, 2))*16+Short.parseShort(tmp.substring(2, 3))*8
+					+Short.parseShort(tmp.substring(3, 4))*4+Short.parseShort(tmp.substring(4, 5))*2+Short.parseShort(tmp.substring(5, 6))*1; 
+			if ((0x00000030 & tmpInt)>> 4 < 2) tmpInt |= 0x00000040; 
+			code = code.append(Character.toString((char)tmpInt)); 
+		}
+		String str = new String(code);
+		return str; 
 	}
 
 	/**
