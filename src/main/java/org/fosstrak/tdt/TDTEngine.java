@@ -844,7 +844,7 @@ public class TDTEngine {
 		}
 	}
 	public String isoTDT(String afi, String tagLength, String input){
-		String isoUrn = "URN:OID:";
+		String isoUrn = "urn:oid:";
 		String parse6Hex = null; 
 		int afiInt = new Integer(afi); 
 		switch (afiInt){
