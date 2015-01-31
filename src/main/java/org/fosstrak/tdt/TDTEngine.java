@@ -880,7 +880,7 @@ public class TDTEngine {
 			   isoUrn = isoUrn+"1.0.17363:";
 			   break; 
 			default:
-			   isoUrn = "nonstd:"; 
+			   isoUrn = "prop:"; 
 			   break;
 		}
 		parse6Hex = parse6HexIso(input, tagLength); 
