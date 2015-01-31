@@ -616,13 +616,13 @@ public class TDTEngine {
 						} else {
 							// *** NEW! - Even if tagLength was wrongly specified in extraparams, we still find a match and reset tagLength
 							// need TO DO the same for findPrefixMatch with 3 parameters (method below)
-							alt_match_list.add(match);
-							realTagLength=Integer.parseInt(schemeTagLength.toString());
-						debugprintln("Added to alt_match_list");
-						debugprintln("Matched scheme :"+match.getScheme().getName().toString());
-						debugprintln("scheme taglength = "+ schemeTagLength);
-						debugprintln("tagLength = "+tagLength);
-						debugprintln("realTagLength = "+realTagLength);
+							//alt_match_list.add(match);
+							//realTagLength=Integer.parseInt(schemeTagLength.toString());
+						//debugprintln("Added to alt_match_list");
+						//debugprintln("Matched scheme :"+match.getScheme().getName().toString());
+						//debugprintln("scheme taglength = "+ schemeTagLength);
+						//debugprintln("tagLength = "+tagLength);
+						//debugprintln("realTagLength = "+realTagLength);
 						}
 					}
 				}
@@ -642,7 +642,7 @@ public class TDTEngine {
 			debugprintln("***EXCEPTION: No schemes or levels matched the input value (line 608)");
 			throw new TDTException("No schemes or levels matched the input value");
 		} else if (match_list.size() > 1) {
-			debugprintln("***EXCEPTION: More than one scheme/level matched the input value (line 611)");
+			debugprintln("***EXCEPTION: More tham one scheme/level matched the input value (line 611)");
 			int patternmatchcount=0;
 			int matchingindex=-1;
 			int currentindex=0;
