@@ -664,7 +664,8 @@ public class TDTEngine {
 			debugprintln("Returning "+match_list.get(matchingindex).getScheme().getName()+" with level "+match_list.get(matchingindex).getLevel().getType()+" and setting tagLength to "+realTagLength);
 			return new PrefixMatch2(match_list.get(matchingindex).getScheme(),match_list.get(matchingindex).getLevel(),Integer.toString(realTagLength));
 			} else {
-			throw new TDTException("More than one scheme/level matched the input value even at pattern level");
+			//throw new TDTException("More than one scheme/level matched the input value even at pattern level");
+				return null; 
 			}
 		} else {
 			debugprintln("Returning "+match_list.get(0).getScheme().getName()+" with level "+match_list.get(0).getLevel().getType()+" and setting tagLength to "+realTagLength);
@@ -959,7 +960,7 @@ public class TDTEngine {
 		}
 
 		PrefixMatch2 matchtemp = findPrefixMatch(input, tagLength);
-		
+		if (matchtemp == null) return ""; 
 		PrefixMatch match = new PrefixMatch(matchtemp.getScheme(),matchtemp.getLevel());
 		inputParameters.put("taglength",matchtemp.getTaglength());
 		debugprintln("Tag length has been set to "+matchtemp.getTaglength());
