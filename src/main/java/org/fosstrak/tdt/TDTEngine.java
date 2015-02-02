@@ -99,7 +99,8 @@ public class TDTEngine {
 	 * matching prefix.
 	 */
 	private Map<LevelTypeList, PrefixTree<PrefixMatch>> prefix_tree_map = new HashMap<LevelTypeList, PrefixTree<PrefixMatch>>();
-
+	private HashMap<String, String> isomap = new HashMap<String, String>(); 
+	private HashMap<String, String> afimap = new HashMap<String, String>(); 
 	/**
 	 * HashMap gs1cpi is an associative array providing a lookup between either
 	 * a GS1 Company Prefix and the corresponding integer-based Company Prefix
@@ -252,6 +253,26 @@ public class TDTEngine {
 		BufferedReader in = new BufferedReader(new InputStreamReader(urlcon
 				.getInputStream()));
 		String line;
+		isomap.put("J", "1.0.15961.13.4:");
+		isomap.put("1J", "1.0.15961.13.36:");
+		isomap.put("2J", "1.0.15961.13.156:");
+		isomap.put("3J", "1.0.15961.13.157:");
+		isomap.put("4J", "1.0.15961.13.159:");
+		isomap.put("5J", "1.0.15961.13.37:");
+		isomap.put("6J", "1.0.15961.13.38:");
+		isomap.put("7B", "1.0.17363:");
+		afimap.put("A1", "1.0.17367:");
+		afimap.put("A2", "1.0.17365:");
+		afimap.put("A3", "1.0.17364:");
+		afimap.put("A4", "1.0.17367:");
+		afimap.put("A5", "1.0.17366:");
+		afimap.put("A6", "1.0.17366:");
+		afimap.put("A7", "1.0.17365:");
+		afimap.put("A8", "1.0.17364:");
+		afimap.put("A9", "1.0.17363:");
+		afimap.put("AA", "1.0.17363:");
+		
+		
 		for (; (line = in.readLine()) != null;) {
 			if (line.endsWith(".xml")) {
 				loadEpcTagDataTranslation(unmar, new URL(schemes.toString()
@@ -848,43 +869,15 @@ public class TDTEngine {
 		String isoUrn = "urn:oid:";
 		String parse6Hex = null; 
 		int afiInt = new Integer(afi); 
-		switch (afiInt){
-		   case 161:
-			   isoUrn = isoUrn+"1.0.17367:";
-			   break; 
-		   case 162:
-			   isoUrn = isoUrn+"1.0.17365:";
-			   break; 
-		   case 163:
-			   isoUrn = isoUrn+"1.0.17364:";
-			   break; 
-		   case 164:
-			   isoUrn = isoUrn+"1.0.17367:";
-			   break; 
-		   case 165:
-			   isoUrn = isoUrn+"1.0.17366:";
-			   break; 
-		   case 166:
-			   isoUrn = isoUrn+"1.0.17366:";
-			   break; 
-		   case 167:
-			   isoUrn = isoUrn+"1.0.17365:";
-			   break; 
-		   case 168:
-			   isoUrn = isoUrn+"1.0.17364:";
-			   break; 
-		   case 169:
-			   isoUrn = isoUrn+"1.0.17363:";
-			   break; 
-		   case 170: 
-			   isoUrn = isoUrn+"1.0.17363:";
-			   break; 
-			default:
-			   isoUrn = "prop:"; 
-			   break;
-		}
 		parse6Hex = parse6HexIso(input, tagLength); 
-		isoUrn = isoUrn + parse6Hex; 
+		String head = parse6Hex.substring(0, 2);
+		String code = parse6Hex.substring(2, parse6Hex.length()); 
+        String tmp = isomap.get(head); 
+        if (!tmp.isEmpty()){
+			isoUrn = isoUrn + isomap.get(head); 
+            isoUrn = isoUrn + code; 
+		}
+	    else isoUrn = null; 
 		return isoUrn; 
 	}
 	public String parse6HexIso(String input, String tagLength){
