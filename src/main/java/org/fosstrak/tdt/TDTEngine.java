@@ -876,6 +876,7 @@ public class TDTEngine {
         if (!tmp.isEmpty()){
 			isoUrn = isoUrn + isomap.get(head); 
             isoUrn = isoUrn + code; 
+            isoUrn = isoUrn.trim(); 
 		}
 	    else isoUrn = null; 
 		return isoUrn; 
