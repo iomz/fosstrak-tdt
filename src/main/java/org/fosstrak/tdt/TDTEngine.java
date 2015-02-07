@@ -661,7 +661,8 @@ public class TDTEngine {
 
 		if (match_list.isEmpty()) {
 			debugprintln("***EXCEPTION: No schemes or levels matched the input value (line 608)");
-			throw new TDTException("No schemes or levels matched the input value");
+			//throw new TDTException("No schemes or levels matched the input value");
+			return null; 
 		} else if (match_list.size() > 1) {
 			debugprintln("***EXCEPTION: More tham one scheme/level matched the input value (line 611)");
 			int patternmatchcount=0;
@@ -861,7 +862,10 @@ public class TDTEngine {
 		  //String tmp = new String("URN:ISO.1552"+hx);
 		  return       isoTDT(afi, tagLength, input);
 		}
-		else {
+		else if (nsi.equals("0")){
+			return ""; 
+		}
+		else{
 		  return (null); 
 		}
 	}
