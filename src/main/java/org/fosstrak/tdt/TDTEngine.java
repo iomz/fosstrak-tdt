@@ -21,7 +21,6 @@
 package org.fosstrak.tdt;
 
 import java.net.*;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -360,6 +359,15 @@ public class TDTEngine {
 	}
 
 	/**
+	 * Get the current line number.
+	 * 
+	 * @return int - Current line number.
+	 */
+	public static int getLineNumber() {
+		return Thread.currentThread().getStackTrace()[2].getLineNumber();
+	}
+
+	/**
 	 * Creates the unmarshaller.
 	 * 
 	 * @return
@@ -385,8 +393,7 @@ public class TDTEngine {
 		URLConnection urlcon = schemeUrl.openConnection();
 		urlcon.connect();
 		// xml doesn't have enough info for jaxb to figure out
-		// the
-		// classname, so we are doing explicit loading
+		// the classname, so we are doing explicit loading
 		JAXBElement<EpcTagDataTranslation> el = unmar.unmarshal(
 				new StreamSource(urlcon.getInputStream()),
 				EpcTagDataTranslation.class);
@@ -636,7 +643,7 @@ public class TDTEngine {
 
 			if (!list.isEmpty()) {
 
-				debugprintln("list is not empty (line 566)");
+				debugprintln("list is not empty [line " + getLineNumber() + "]");
 
 				if (strTagLength == null)
 					match_list.addAll(list);
@@ -686,21 +693,27 @@ public class TDTEngine {
 		}
 
 		if (match_list.isEmpty()) {
-			debugprintln("***EXCEPTION: No schemes or levels matched the input value (line 608)");
+			debugprintln("***EXCEPTION: No schemes or levels matched the input value [line "
+					+ getLineNumber() + "]");
 			// throw new
 			// TDTException("No schemes or levels matched the input value");
 			return null;
 		} else if (match_list.size() > 1) {
-			debugprintln("***EXCEPTION: More tham one scheme/level matched the input value (line 611)");
+			debugprintln("***EXCEPTION: More tham one scheme/level matched the input value [line "
+					+ getLineNumber() + "]");
 			int patternmatchcount = 0;
 			int matchingindex = -1;
 			int currentindex = 0;
 			for (PrefixMatch cand : match_list) {
 				boolean patternmatch = false;
+				debugprintln(cand.getScheme().getName() + "----");
 				for (Option candopt : cand.getLevel().getOption()) {
 					Matcher matcher = Pattern.compile(
 							"^" + candopt.getPattern() + "$").matcher(input);
+					debugprintln("try pattern matching with "
+							+ candopt.getPattern());
 					if (matcher.lookingAt()) {
+						debugprintln("=> Match!");
 						patternmatch = true;
 					}
 				}
@@ -772,11 +785,13 @@ public class TDTEngine {
 		}
 
 		if (match_list.isEmpty()) {
-			debugprintln("***EXCPETION: No schemes or levels matched the input value (line 679)");
+			debugprintln("***EXCPETION: No schemes or levels matched the input value [line "
+					+ getLineNumber() + "]");
 			throw new TDTException(
 					"No schemes or levels matched the input value");
 		} else if (match_list.size() > 1) {
-			debugprintln("***EXCEPTION: More than one scheme/level matched the input value (line 682)");
+			debugprintln("***EXCEPTION: More than one scheme/level matched the input value [line "
+					+ getLineNumber() + "]");
 			int patternmatchcount = 0;
 			int matchingindex = -1;
 			int currentindex = 0;
@@ -844,7 +859,7 @@ public class TDTEngine {
 			String tagLength, Map<String, String> suppliedInputParameters,
 			LevelTypeList outputLevel) {
 
-		debugprintln("convert (line 699)");
+		debugprintln("convert [line " + getLineNumber() + "]");
 		Map<String, String> inputParameters = suppliedInputParameters;
 		debugprintln("inputParameters were");
 		Iterator i = inputParameters.keySet().iterator();
@@ -867,7 +882,8 @@ public class TDTEngine {
 		// specified in the input parameters (since its value may contradict the
 		// value obtained from pattern matching the input)
 
-		debugprintln("[line 718] matchtemp.getLevel().getType() = "
+		debugprintln("[line " + getLineNumber()
+				+ "] matchtemp.getLevel().getType() = "
 				+ matchtemp.getLevel().getType().toString());
 
 		return convertLevel(match.getScheme(), match.getLevel(), input,
@@ -896,7 +912,7 @@ public class TDTEngine {
 			Map<String, String> suppliedInputParameters, String nsi,
 			String afi, String tagLength, LevelTypeList outputLevel) {
 
-		debugprintln("convert (line 748)");
+		debugprintln("convert [line " + getLineNumber() + "]");
 		debugprintln("===============================================");
 		debugprintln("CONVERT " + input + " to " + outputLevel.toString());
 
@@ -977,7 +993,7 @@ public class TDTEngine {
 			Map<String, String> suppliedInputParameters,
 			LevelTypeList outputLevel) {
 
-		debugprintln("convert (line 748)");
+		debugprintln("convert [line " + getLineNumber() + "]");
 		debugprintln("===============================================");
 		debugprintln("CONVERT " + input + " to " + outputLevel.toString());
 
@@ -1023,10 +1039,11 @@ public class TDTEngine {
 		// specified in the input parameters (since its value may contradict the
 		// value obtained from pattern matching the input)
 
-		debugprintln("[line 786] matchtemp.getLevel().getType() = "
+		debugprintln("[line " + getLineNumber()
+				+ "] matchtemp.getLevel().getType() = "
 				+ matchtemp.getLevel().getType().toString());
 
-		debugprintln("reached line 788");
+		debugprintln("reached line 1027");
 
 		// if a URI is supplied, remember to perform URL decoding on it before
 		// passing it to the convertLevel() method
@@ -1045,7 +1062,8 @@ public class TDTEngine {
 	private String convertLevel(Scheme tdtscheme, Level tdtlevel, String input,
 			Map<String, String> inputParameters, LevelTypeList outboundlevel) {
 
-		debugprintln("convertLevel (line 820) - 19:12 21st October 2010");
+		debugprintln("convertLevel [line " + getLineNumber()
+				+ "] - 19:12 21st October 2010");
 		debugprintln("===============================================");
 		debugprintln("CONVERT " + input + " to " + outboundlevel.toString());
 
@@ -1085,7 +1103,7 @@ public class TDTEngine {
 		Map<String, Option> pattern_map = new HashMap<String, Option>();
 		Map<String, Matcher> matcher_map = new HashMap<String, Matcher>();
 
-		debugprintln("line 858 input = " + input);
+		debugprintln("line 1086 input = " + input);
 
 		for (Option opt : tdtlevel.getOption()) {
 			if (optionValue == null || optionValue.equals(opt.getOptionKey())) {
@@ -1108,8 +1126,10 @@ public class TDTEngine {
 		debugprintln("Size of pattern_map is " + pattern_map.size());
 
 		if (pattern_map.isEmpty()) {
-			debugprintln("***EXCEPTION: No patterns matched (line 879)");
-			throw new TDTException("No patterns matched (line 880)");
+			debugprintln("***EXCEPTION: No patterns matched [line "
+					+ getLineNumber() + "]");
+			throw new TDTException("No patterns matched [line "
+					+ getLineNumber() + "]");
 		}
 
 		if (pattern_map.size() > 1) {
@@ -1360,14 +1380,12 @@ public class TDTEngine {
 			} else {
 
 				// this deals with the situation where the input is not BINARY
-				debugprintln("Converting from non-binary levels at line 1060");
+				debugprintln("Converting from non-binary levels [line " + getLineNumber() + "]");
 				debugprintln("Fieldname = " + strfieldname);
 				debugprintln("Value = " + strfieldvaluematched);
-				debugprintln("Line 1063");
 				if (tagurifield != null) {
 					debugprintln("Permitted character set = "
-							+ tagurifield.getCharacterSet());
-					debugprintln("Line 1066");
+							+ tagurifield.getCharacterSet() + " [line " + getLineNumber() + "]");
 					debugprintln("Decimal min = "
 							+ tagurifield.getDecimalMinimum());
 					debugprintln("Decimal max = "
@@ -1672,6 +1690,10 @@ public class TDTEngine {
 			if (outboundlevel == LevelTypeList.BINARY) {
 				Field tagurifield = findField(tdttagurioption, testfieldname,
 						tdttagurilevel);
+				if (tagurifield == null) {
+					continue;
+				}
+				
 				if (tagurifield.getDecimalMinimum() != null) {
 					debugprintln("Decimal minimum = "
 							+ tagurifield.getDecimalMinimum());
@@ -1687,6 +1709,11 @@ public class TDTEngine {
 							testfield.getDecimalMaximum());
 				}
 			} else {
+				if (extraparams.get(testfieldname) == null
+						|| extraparams.get(testfieldname) == "") {
+					continue;
+				}
+
 				if (testfield.getDecimalMinimum() != null) {
 					debugprintln("Decimal minimum = "
 							+ testfield.getDecimalMinimum());
@@ -1730,7 +1757,7 @@ public class TDTEngine {
 	 */
 	public String bin2dec(String binary) {
 
-		debugprintln("(line 1285) binary = " + binary);
+		debugprintln("[line " + getLineNumber() + "] binary = " + binary);
 		if (binary.length() == 0) {
 			return "0";
 		} else {
@@ -1751,7 +1778,7 @@ public class TDTEngine {
 			decimal = "1";
 		}
 
-		debugprintln("(line 1301) decimal = " + decimal);
+		debugprintln("[line " + getLineNumber() + "] decimal = " + decimal);
 		if (decimal.length() == 0) {
 			return "0";
 		} else {
@@ -1881,7 +1908,7 @@ public class TDTEngine {
 	public String hex2bin(String hex) {
 		int lenhex = hex.length();
 
-		debugprintln("(line 1407) hex = " + hex);
+		debugprintln("[line " + getLineNumber() + "] hex = " + hex);
 		if (hex.length() == 0) {
 			return "";
 		} else {
@@ -1908,7 +1935,7 @@ public class TDTEngine {
 		int lenbin = binary.length();
 		int lenhex = ((lenbin + 3) / 4);
 
-		debugprintln("(line 1428) binary = " + binary);
+		debugprintln("[line " + getLineNumber() + "] binary = " + binary);
 		if (binary.length() == 0) {
 			return "";
 		} else {
@@ -1942,10 +1969,10 @@ public class TDTEngine {
 						|| (outboundlevel == LevelTypeList.PURE_IDENTITY)) {
 
 					formattedparam = uriescape(extraparams.get(fields[i]));
-					debugprintln("(line 1484) param = "
+					debugprintln("[line " + getLineNumber() + "] param = "
 							+ extraparams.get(fields[i]));
-					debugprintln("(line 1485) formattedparam = "
-							+ formattedparam);
+					debugprintln("[line " + getLineNumber()
+							+ "] formattedparam = " + formattedparam);
 
 				} else {
 					formattedparam = extraparams.get(fields[i]);
@@ -2929,6 +2956,7 @@ public class TDTEngine {
 		BufferedReader br = new BufferedReader(new InputStreamReader(source,
 				"US-ASCII"));
 		try {
+			@SuppressWarnings("unused")
 			String line;
 			while ((line = br.readLine()) != null) {
 				// debugprintln(line);
