@@ -74,9 +74,9 @@
   <!-- Infrastructure -->
   <!-- =========================================================== -->
   <scm>
-    <connection>https://fosstrak.googlecode.com/svn/tdt/tags/tdt-1.0.0</connection>
-    <developerConnection>scm:svn:https://fosstrak.googlecode.com/svn/tdt/tags/tdt-1.0.0</developerConnection>
-    <url>https://fosstrak.googlecode.com/svn/tdt/tags/tdt-1.0.0</url>
+    <url>https://github.com/Auto-ID-Lab-Japan/fosstrak-tdt</url>
+    <connection>scm:git:https://github.com/Auto-ID-Lab-Japan/fosstrak-tdt.git</connection>
+    <developerConnection>scm:git:git@github.com:Auto-ID-Lab-Japan/fosstrak-tdt.git</developerConnection>
   </scm>
   <!-- =========================================================== -->
   <!-- Project Information -->
@@ -235,10 +235,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.8</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
         <configuration>
           <maxmemory>1024</maxmemory>
           <aggregate>true</aggregate>
@@ -247,6 +249,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
@@ -268,6 +271,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
+        <version>3.0.1</version>
         <configuration>
           <threshold>Low</threshold>
           <effort>Default</effort>
@@ -281,10 +285,12 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
+        <version>2.4</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-changes-plugin</artifactId>
+        <version>2.11</version>
         <reportSets>
           <reportSet>
             <reports>
