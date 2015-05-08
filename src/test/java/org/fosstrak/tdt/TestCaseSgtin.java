@@ -59,6 +59,21 @@ public class TestCaseSgtin extends TestCase {
 		}
 	}
 
+	public void testBinaryToSGTIN96() {
+		System.out.println("Starting testBinaryToSGTIN96()");
+		params.put("taglength", "96");
+		// ................................................................................................
+		String orig = "001100000010110110110011000110011010000000000000000000000100000000000000000000000000000010010001";
+		String s = engine.convert(orig, params, LevelTypeList.PURE_IDENTITY);
+		String expect = "urn:epc:id:sgtin:456235520.0001.145";
+		Assert.assertEquals(expect, s);
+		if (expect.equals(s)) {
+			System.out.println("***PASSED");
+		} else {
+			System.out.println("***FAILED");
+		}
+	}
+	
 	public void testPage13Staged() {
 		System.out.println("Starting testPage13Staged()");
 		// this test follows fig 4 on page 13 of TDT Spec
