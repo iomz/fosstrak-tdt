@@ -628,22 +628,24 @@ public class TDTEngine {
 	 */
 	private PrefixMatch2 findPrefixMatch(String input, String strTagLength) {
 
-		debugprintln("PrefixMatch with 2 parameters: specified strTagLength = "
-				+ strTagLength);
-		debugprintln("input was: " + input);
+		debugprintln("[line " + getLineNumber()
+				+ "] PrefixMatch with 2 parameters: specified strTagLength = " + strTagLength);
+		//debugprintln("input was: " + input);
 
 		int realTagLength = Integer.parseInt(strTagLength);
 
 		List<PrefixMatch> match_list = new ArrayList<PrefixMatch>();
 		List<PrefixMatch> alt_match_list = new ArrayList<PrefixMatch>();
 
+		//debugprintln("prefix_tree_map size: " + Integer.toString(prefix_tree_map.values().size()));
 		for (PrefixTree<PrefixMatch> tree : prefix_tree_map.values()) {
-
+			
+			//debugprintln("[line " + getLineNumber() + "]" + tree.toString());
 			List<PrefixMatch> list = tree.search(input);
 
 			if (!list.isEmpty()) {
 
-				debugprintln("list is not empty [line " + getLineNumber() + "]");
+				//debugprintln("list is not empty [line " + getLineNumber() + "]");
 
 				if (strTagLength == null)
 					match_list.addAll(list);
@@ -655,12 +657,12 @@ public class TDTEngine {
 								.getTagLength();
 						if (tagLength.compareTo(schemeTagLength) == 0) {
 							match_list.add(match);
-							debugprintln("Added to match_list");
+							//debugprintln("Added to match_list");
 							debugprintln("Matched scheme :"
 									+ match.getScheme().getName().toString());
 							debugprintln("scheme taglength = "
 									+ schemeTagLength);
-							debugprintln("tagLength = " + tagLength);
+							//debugprintln("tagLength = " + tagLength);
 							realTagLength = Integer.parseInt(schemeTagLength
 									.toString());
 						} else {
@@ -684,7 +686,7 @@ public class TDTEngine {
 		}
 
 		if (match_list.isEmpty()) {
-			debugprintln("match_list was empty");
+			//debugprintln("match_list was empty");
 			if (alt_match_list.size() == 1) {
 				debugprintln("but alt_match_list has one element: "
 						+ alt_match_list.get(0).getScheme().getName());
@@ -706,14 +708,13 @@ public class TDTEngine {
 			int currentindex = 0;
 			for (PrefixMatch cand : match_list) {
 				boolean patternmatch = false;
-				debugprintln(cand.getScheme().getName() + "----");
+				//debugprintln(cand.getScheme().getName() + "----");
 				for (Option candopt : cand.getLevel().getOption()) {
 					Matcher matcher = Pattern.compile(
 							"^" + candopt.getPattern() + "$").matcher(input);
-					debugprintln("try pattern matching with "
-							+ candopt.getPattern());
+					//debugprintln("try pattern matching with " + candopt.getPattern());
 					if (matcher.lookingAt()) {
-						debugprintln("=> Match!");
+						//debugprintln("=> Match!");
 						patternmatch = true;
 					}
 				}
@@ -859,15 +860,18 @@ public class TDTEngine {
 			String tagLength, Map<String, String> suppliedInputParameters,
 			LevelTypeList outputLevel) {
 
-		debugprintln("convert [line " + getLineNumber() + "]");
+		debugprintln("Convert [line " + getLineNumber() + "] "
+				 + input + " to " + outputLevel.toString());
+		debugprintln("===============================================");
+		
 		Map<String, String> inputParameters = suppliedInputParameters;
-		debugprintln("inputParameters were");
+		//debugprintln("inputParameters were");
 		Iterator i = inputParameters.keySet().iterator();
 		while (i.hasNext()) {
 			String key = i.next().toString();
-			debugprintln(key + "=" + inputParameters.get(key));
+			//debugprintln(key + "=" + inputParameters.get(key));
 		}
-		debugprintln("End of inputParameters");
+		//debugprintln("End of inputParameters");
 
 		if (input.startsWith("urn:epc:")) {
 			input = uriunescape(input);
@@ -912,12 +916,12 @@ public class TDTEngine {
 			Map<String, String> suppliedInputParameters, String nsi,
 			String afi, String tagLength, LevelTypeList outputLevel) {
 
-		debugprintln("convert [line " + getLineNumber() + "]");
+		debugprintln("Convert [line " + getLineNumber() + "] "
+				 + input + " to " + outputLevel.toString());
 		debugprintln("===============================================");
-		debugprintln("CONVERT " + input + " to " + outputLevel.toString());
 
 		// GS1keys
-		if (nsi.equals("0") & tagLength.equals("96")) {
+		if (nsi.equals("0") && tagLength.equals("96")) {
 			suppliedInputParameters.put("taglength", "96");
 			return this.convert(input, suppliedInputParameters, outputLevel);
 		}
@@ -933,19 +937,27 @@ public class TDTEngine {
 	}
 
 	public String isoTDT(String afi, String tagLength, String input) {
+		debugprintln("[line " + getLineNumber() + "] ISO tag detected");
 		String isoUrn = "urn:oid:";
-		String parse6Hex = null;
-		int afiInt = new Integer(afi);
-		parse6Hex = parse6HexIso(input, tagLength);
-		String head = parse6Hex.substring(0, 2);
-		String code = parse6Hex.substring(2, parse6Hex.length());
-		String tmp = isomap.get(head);
-		if (!tmp.isEmpty()) {
-			isoUrn = isoUrn + isomap.get(head);
-			isoUrn = isoUrn + code;
+		String parsed6Hex = parse6HexIso(input, tagLength);
+		//String head = parse6Hex.substring(0, 2);
+		//String isoStandard = isomap.get(head);
+		String hexAfi = dec2hex(afi);
+		String isoStandard = afimap.get(hexAfi);
+		debugprintln("afi: " + hexAfi);
+		debugprintln("iso standard: " + isoStandard.substring(0, isoStandard.length()-1));
+		debugprintln("6bit-encoding id: " + parsed6Hex);
+		if (!isoStandard.isEmpty()) {
+			//isoUrn = isoUrn + isomap.get(head);
+			isoUrn = isoUrn + isoStandard;
+			//isoUrn = isoUrn + parse6Hex.substring(2, parse6Hex.length());
+			isoUrn = isoUrn + parsed6Hex;
 			isoUrn = isoUrn.trim();
 		} else
 			isoUrn = null;
+		debugprintln("RESULT after building grammar = " + isoUrn);
+		debugprintln("===============================================================================");
+		debugprintln("");
 		return isoUrn;
 	}
 
@@ -993,22 +1005,22 @@ public class TDTEngine {
 			Map<String, String> suppliedInputParameters,
 			LevelTypeList outputLevel) {
 
-		debugprintln("convert [line " + getLineNumber() + "]");
+		debugprintln("Convert [line " + getLineNumber() + "] "
+				 + input + " to " + outputLevel.toString());
 		debugprintln("===============================================");
-		debugprintln("CONVERT " + input + " to " + outputLevel.toString());
 
 		Map<String, String> inputParameters = suppliedInputParameters;
 
 		debugprintln("GS1 CP length = "
 				+ inputParameters.get("gs1companyprefixlength"));
 
-		debugprintln("inputParameters were");
+		//debugprintln("inputParameters were");
 		Iterator i = inputParameters.keySet().iterator();
 		while (i.hasNext()) {
 			String key = i.next().toString();
-			debugprintln(key + "=" + inputParameters.get(key));
+			//debugprintln(key + "=" + inputParameters.get(key));
 		}
-		debugprintln("End of inputParameters");
+		//debugprintln("End of inputParameters");
 
 		String tagLength = null;
 		String decodedinput;
@@ -1020,7 +1032,7 @@ public class TDTEngine {
 			String s = inputParameters.get("taglength");
 			tagLength = s;
 
-			debugprintln("taglength was provided.  tagLength = " + s);
+			//debugprintln("taglength was provided.  tagLength = " + s);
 		}
 
 		if (input.startsWith("urn:epc:")) {
@@ -1033,17 +1045,19 @@ public class TDTEngine {
 		PrefixMatch match = new PrefixMatch(matchtemp.getScheme(),
 				matchtemp.getLevel());
 		inputParameters.put("taglength", matchtemp.getTaglength());
-		debugprintln("Tag length has been set to " + matchtemp.getTaglength());
+		//debugprintln("Tag length has been set to " + matchtemp.getTaglength());
 
 		// if the input is binary or URI, ignore any value of optionKey that is
 		// specified in the input parameters (since its value may contradict the
 		// value obtained from pattern matching the input)
 
+		/*
 		debugprintln("[line " + getLineNumber()
 				+ "] matchtemp.getLevel().getType() = "
 				+ matchtemp.getLevel().getType().toString());
+		*/
 
-		debugprintln("reached line 1027");
+		//debugprintln("reached line " + getLineNumber());
 
 		// if a URI is supplied, remember to perform URL decoding on it before
 		// passing it to the convertLevel() method
@@ -1062,10 +1076,9 @@ public class TDTEngine {
 	private String convertLevel(Scheme tdtscheme, Level tdtlevel, String input,
 			Map<String, String> inputParameters, LevelTypeList outboundlevel) {
 
-		debugprintln("convertLevel [line " + getLineNumber()
-				+ "] - 19:12 21st October 2010");
+		debugprintln("Convert [line " + getLineNumber() + "] "
+				 + input + " to " + outboundlevel.toString());
 		debugprintln("===============================================");
-		debugprintln("CONVERT " + input + " to " + outboundlevel.toString());
 
 		String outboundstring;
 		Map<String, String> extraparams =
@@ -1079,7 +1092,7 @@ public class TDTEngine {
 		String optionValue;
 		String optionkey = tdtscheme.getOptionKey();
 		debugprintln("optionkey for scheme = " + optionkey);
-		debugprintln("tdtlevel.getType() = " + tdtlevel.getType().toString());
+		//debugprintln("tdtlevel.getType() = " + tdtlevel.getType().toString());
 		if (!((tdtlevel.getType() == LevelTypeList.TAG_ENCODING)
 				|| (tdtlevel.getType() == LevelTypeList.PURE_IDENTITY) || (tdtlevel
 					.getType() == LevelTypeList.BINARY))) {
@@ -1087,7 +1100,7 @@ public class TDTEngine {
 		} else {
 			optionValue = null;
 		}
-		debugprintln("optionValue = " + optionValue);
+		//debugprintln("optionValue = " + optionValue);
 
 		// the name of a parameter which allows the appropriate option
 		// to be selected
@@ -1103,27 +1116,27 @@ public class TDTEngine {
 		Map<String, Option> pattern_map = new HashMap<String, Option>();
 		Map<String, Matcher> matcher_map = new HashMap<String, Matcher>();
 
-		debugprintln("line 1086 input = " + input);
+		//debugprintln("[line "  + getLineNumber() + "] input = " + input);
 
 		for (Option opt : tdtlevel.getOption()) {
 			if (optionValue == null || optionValue.equals(opt.getOptionKey())) {
 				// possible match
-				debugprintln("optionValue = " + optionValue);
-				debugprintln("opt.getOptionKey() = " + opt.getOptionKey());
-				debugprintln("Pattern = " + opt.getPattern());
+				//debugprintln("optionValue = " + optionValue);
+				//debugprintln("opt.getOptionKey() = " + opt.getOptionKey());
+				//debugprintln("Pattern = " + opt.getPattern());
 
 				Matcher matcher = Pattern.compile("^" + opt.getPattern())
 						.matcher(input);
-				debugprintln("lookingAt ^" + opt.getPattern());
+				//debugprintln("lookingAt ^" + opt.getPattern());
 				if (matcher.lookingAt()) {
-					debugprintln("MATCHED!");
+					//debugprintln("MATCHED!");
 					pattern_map.put(opt.getOptionKey(), opt);
 					matcher_map.put(opt.getOptionKey(), matcher);
 				}
 			}
 		}
 
-		debugprintln("Size of pattern_map is " + pattern_map.size());
+		//debugprintln("Size of pattern_map is " + pattern_map.size());
 
 		if (pattern_map.isEmpty()) {
 			debugprintln("***EXCEPTION: No patterns matched [line "
@@ -1133,13 +1146,13 @@ public class TDTEngine {
 		}
 
 		if (pattern_map.size() > 1) {
-			debugprintln("optionkey = " + optionkey);
+			//debugprintln("optionkey = " + optionkey);
 			debugprintln("extraparams.get(" + optionkey + ") = "
 					+ extraparams.get(optionkey));
-			debugprintln("optionValue = " + optionValue);
+			//debugprintln("optionValue = " + optionValue);
 
 			if (pattern_map.containsKey(optionValue)) {
-				debugprintln("matchingOptionKey = " + optionValue);
+				//debugprintln("matchingOptionKey = " + optionValue);
 				debugprintln("matchingOption has pattern = "
 						+ pattern_map.get(optionValue).getPattern());
 				matchingOptionKey = optionValue;
@@ -1159,31 +1172,31 @@ public class TDTEngine {
 		}
 
 		optionValue = matchingOptionKey;
-		debugprintln("optionValue = " + optionValue);
+		//debugprintln("optionValue = " + optionValue);
 
 		Level tdtoutlevel = findLevel(tdtscheme, outboundlevel);
 
-		debugprint("tdtoutlevel prefixMatch = ");
+		//debugprint("tdtoutlevel prefixMatch = ");
 		if (tdtoutlevel.getPrefixMatch() != null) {
-			debugprintln(tdtoutlevel.getPrefixMatch().toString());
+			//debugprintln(tdtoutlevel.getPrefixMatch().toString());
 		} else {
-			debugprintln("null");
+			//debugprintln("null");
 		}
 
 		Level tdttagurilevel = findLevel(tdtscheme, LevelTypeList.TAG_ENCODING);
 		Level tdtbinarylevel = findLevel(tdtscheme, LevelTypeList.BINARY);
 
-		debugprint("tdttagurilevel prefixMatch = ");
-		debugprintln(tdttagurilevel.getPrefixMatch().toString());
+		//debugprint("tdttagurilevel prefixMatch = ");
+		//debugprintln(tdttagurilevel.getPrefixMatch().toString());
 
 		Option tdtoutoption = findOption(tdtoutlevel, optionValue);
 
 		debugprint("tdtoutoption pattern = ");
 		try { // 2015.jan.19 jm to suppress tdtoutoption = null
 			if (tdtoutoption.getPattern() != null) {
-				debugprintln(tdtoutoption.getPattern().toString());
+				//debugprintln(tdtoutoption.getPattern().toString());
 			} else {
-				debugprintln("null");
+				//debugprintln("null");
 			}
 		} catch (NullPointerException e) {
 			debugprint("option null\n");
@@ -1192,8 +1205,8 @@ public class TDTEngine {
 		Option tdttagurioption = findOption(tdttagurilevel, optionValue);
 		Option tdtbinaryoption = findOption(tdtbinarylevel, optionValue);
 
-		debugprint("tdttagurioption pattern = ");
-		debugprintln(tdttagurioption.getPattern().toString());
+		//debugprint("tdttagurioption pattern = ");
+		//debugprintln(tdttagurioption.getPattern().toString());
 
 		// EXTRACTION of values or each of the fields.
 
@@ -1228,7 +1241,7 @@ public class TDTEngine {
 					tdtbinarylevel);
 
 			if (tdtlevel.getType() == LevelTypeList.BINARY) {
-				debugprintln("Converting from BINARY to NON-BINARY - see Figure 9b");
+				//debugprintln("Converting from BINARY to NON-BINARY - see Figure 9b");
 				String result9blayer1;
 				String result9blayer2;
 				String result9blayer3;
@@ -1259,7 +1272,7 @@ public class TDTEngine {
 									binaryfield.getBitPadDir(), intcompaction);
 						} else {
 							result9blayer1 = strfieldvaluematched;
-							debugprintln("Invalid value for compaction");
+							//debugprintln("Invalid value for compaction");
 						}
 
 					} else {
@@ -1276,9 +1289,11 @@ public class TDTEngine {
 
 					// check that the string value only contains characters from
 					// the permitted character set
+					/*
 					debugprintln("9b: Checking that result " + result9blayer2
 							+ " is within character set "
 							+ tagurifield.getCharacterSet());
+					*/
 					checkWithinCharacterSet(strfieldname, result9blayer2,
 							tagurifield.getCharacterSet());
 
@@ -1301,9 +1316,6 @@ public class TDTEngine {
 
 					result9blayer2 = bin2dec(result9blayer1);
 
-					debugprintln("9b: Intermediate results at layer 2="
-							+ result9blayer2);
-
 					// check that the numeric value is not less than the
 					// specified minimum nor greater than the specified maximum
 
@@ -1311,36 +1323,30 @@ public class TDTEngine {
 					// stage, as building grammar - not here
 
 					if (result9blayer2.length() > 0) {
-						debugprintln("9b: Checking min/max for result9blayer2="
-								+ result9blayer2);
 
 						if (tagurifield.getDecimalMinimum() != null) {
-							debugprintln("9b: Checking minimum :"
-									+ tagurifield.getDecimalMinimum());
 							checkMinimum(strfieldname, new BigInteger(
 									result9blayer2),
 									tagurifield.getDecimalMinimum());
 						}
 						if (tagurifield.getDecimalMaximum() != null) {
-							debugprintln("9b: Checking maximum :"
-									+ tagurifield.getDecimalMaximum());
 							checkMaximum(strfieldname, new BigInteger(
 									result9blayer2),
 									tagurifield.getDecimalMaximum());
 						}
 					}
 
-					debugprintln("9b: end if after checking min/max");
+					//debugprintln("9b: end if after checking min/max");
 				}
 
-				debugprintln("9b: Finished checking min/max");
+				//debugprintln("9b: Finished checking min/max");
 				if (binaryfield.getPadChar() != null) {
 					if (tagurifield.getPadChar() != null) {
 						// invalid TDT file
 						result9blayer3 = result9blayer2;
-						debugprintln("9b: Invalid TDT file");
+						//debugprintln("9b: Invalid TDT file");
 					} else {
-						debugprintln("9b: Preparing to strip pad characters if required");
+						//debugprintln("9b: Preparing to strip pad characters if required");
 						// strip at the padDir edge any successive instances of
 						// the character indicated by padChar attribute (padChar
 						// and padDir read from the binary level)
@@ -1351,7 +1357,7 @@ public class TDTEngine {
 
 				} else {
 					if (tagurifield.getPadChar() != null) {
-						debugprintln("9b: Preparing to apply pad characters if required");
+						//debugprintln("9b: Preparing to apply pad characters if required");
 						// pad at the padDir edge with character indicated by
 						// padChar attribute to reach a total length of
 						// characters indicated by length attribute (padChar,
@@ -1367,10 +1373,7 @@ public class TDTEngine {
 
 				}
 
-				debugprintln("9b\tFinal result result9blayer3 = "
-						+ result9blayer3);
-				debugprintln("tagurifield.getLength() = "
-						+ tagurifield.getLength());
+				debugprintln("Final result result9blayer3: "+ result9blayer3);
 				if ((tagurifield != null) && (tagurifield.getLength() != null)
 						&& (tagurifield.getLength().intValue() == 0)) {
 					extraparams.put(strfieldname, "");
@@ -1380,10 +1383,11 @@ public class TDTEngine {
 			} else {
 
 				// this deals with the situation where the input is not BINARY
-				debugprintln("Converting from non-binary levels [line " + getLineNumber() + "]");
-				debugprintln("Fieldname = " + strfieldname);
-				debugprintln("Value = " + strfieldvaluematched);
+				//debugprintln("Converting from non-binary levels [line " + getLineNumber() + "]");
+				//debugprintln("Fieldname = " + strfieldname);
+				//debugprintln("Value = " + strfieldvaluematched);
 				if (tagurifield != null) {
+					/*
 					debugprintln("Permitted character set = "
 							+ tagurifield.getCharacterSet() + " [line " + getLineNumber() + "]");
 					debugprintln("Decimal min = "
@@ -1391,6 +1395,7 @@ public class TDTEngine {
 					debugprintln("Decimal max = "
 							+ tagurifield.getDecimalMaximum());
 					debugprintln("");
+					*/
 
 					// check that the value is within the permitted character
 					// set (if this is defined for the field at the TAG_ENCODING
@@ -1400,7 +1405,7 @@ public class TDTEngine {
 					// not here.
 
 					if (tagurifield.getCharacterSet() != null) {
-						debugprintln("9b else: check character set");
+						//debugprintln("9b else: check character set");
 						checkWithinCharacterSet(strfieldname,
 								strfieldvaluematched,
 								tagurifield.getCharacterSet());
@@ -1411,7 +1416,7 @@ public class TDTEngine {
 					// at the TAG_ENCODING level)
 					if ((tagurifield.getDecimalMinimum() != null)
 							&& (strfieldvaluematched.length() > 0)) {
-						debugprintln("9b else: checkMin");
+						//debugprintln("9b else: checkMin");
 						checkMinimum(strfieldname, new BigInteger(
 								strfieldvaluematched),
 								tagurifield.getDecimalMinimum());
@@ -1422,7 +1427,7 @@ public class TDTEngine {
 					// at the TAG_ENCODING level)
 					if ((tagurifield.getDecimalMaximum() != null)
 							&& (strfieldvaluematched.length() > 0)) {
-						debugprintln("9b else: checkMax");
+						//debugprintln("9b else: checkMax");
 						checkMaximum(strfieldname, new BigInteger(
 								strfieldvaluematched),
 								tagurifield.getDecimalMaximum());
@@ -1454,7 +1459,7 @@ public class TDTEngine {
 		 * obtained by the pattern match process
 		 */
 
-		debugprintln("Processing RULE elements of type 'EXTRACT'");
+		//debugprintln("Processing RULE elements of type 'EXTRACT'");
 		int seq = 0;
 		for (Rule tdtrule : tdtlevel.getRule()) {
 			if (tdtrule.getType() == ModeList.EXTRACT) {
@@ -1466,7 +1471,7 @@ public class TDTEngine {
 			}
 		}
 
-		debugprintln("Finished processing 'EXTRACT' rules");
+		//debugprintln("Finished processing 'EXTRACT' rules");
 
 		/**
 		 * Now we need to consider the corresponding output level and output
@@ -1484,7 +1489,7 @@ public class TDTEngine {
 		 * the outbound format
 		 */
 
-		debugprintln("Processing RULE elements of type 'FORMAT'");
+		//debugprintln("Processing RULE elements of type 'FORMAT'");
 		seq = 0;
 		for (Rule tdtrule : tdtoutlevel.getRule()) {
 			if (tdtrule.getType() == ModeList.FORMAT) {
@@ -1507,10 +1512,10 @@ public class TDTEngine {
 		 * is always to the left with the zero bit.
 		 */
 
-		debugprintln("Finished processing 'FORMAT' rules");
+		//debugprintln("Finished processing 'FORMAT' rules");
 
 		if (tdtoutlevel.getType() == LevelTypeList.BINARY) {
-			debugprintln("Converting output fields from NON-BINARY to BINARY - see Figure 9a");
+			//debugprintln("Converting output fields from NON-BINARY to BINARY - see Figure 9a");
 
 			for (Field field : tdtoutoption.getField()) {
 
@@ -1530,7 +1535,7 @@ public class TDTEngine {
 
 					if (tagurifield.getPadChar() != null) {
 						if (binaryfield.getPadChar() != null) {
-							debugprintln("9a Invalid TDT definition file");
+							//debugprintln("9a Invalid TDT definition file");
 							result9alayer1 = "";
 						} else {
 							// Strip non-binary field of any successive pad
@@ -1603,7 +1608,7 @@ public class TDTEngine {
 								binaryfield.getBitPadDir(), "0", binaryfield
 										.getBitLength().intValue());
 					} else {
-						debugprintln("9a Don't pad at binary level");
+						//debugprintln("9a Don't pad at binary level");
 						result9alayer3 = result9alayer2;
 					}
 
@@ -1635,7 +1640,7 @@ public class TDTEngine {
 								binaryfield.getBitPadDir(), "0", binaryfield
 										.getBitLength().intValue());
 					} else {
-						debugprintln("9a Don't pad at binary level");
+						//debugprintln("9a Don't pad at binary level");
 						result9alayer3 = dec2bin(strfieldvaluematched);
 					}
 
@@ -1670,7 +1675,7 @@ public class TDTEngine {
 		 * Construct the output from the specified grammar (in ABNF format)
 		 * together with the field values stored in inputparams
 		 */
-		debugprintln("Building final grammar");
+		//debugprintln("Building final grammar");
 
 		// *** need to do check min/max just before building grammar - not
 		// earlier
@@ -1695,15 +1700,11 @@ public class TDTEngine {
 				}
 				
 				if (tagurifield.getDecimalMinimum() != null) {
-					debugprintln("Decimal minimum = "
-							+ tagurifield.getDecimalMinimum());
 					checkMinimum(testfieldname, new BigInteger(
 							bin2dec(extraparams.get(testfieldname))),
 							testfield.getDecimalMinimum());
 				}
 				if (tagurifield.getDecimalMaximum() != null) {
-					debugprintln("Decimal maximum = "
-							+ tagurifield.getDecimalMaximum());
 					checkMaximum(testfieldname, new BigInteger(
 							bin2dec(extraparams.get(testfieldname))),
 							testfield.getDecimalMaximum());
@@ -1715,22 +1716,16 @@ public class TDTEngine {
 				}
 
 				if (testfield.getDecimalMinimum() != null) {
-					debugprintln("Decimal minimum = "
-							+ testfield.getDecimalMinimum());
 					checkMinimum(testfieldname,
 							new BigInteger(extraparams.get(testfieldname)),
 							testfield.getDecimalMinimum());
 				}
 				if (testfield.getDecimalMaximum() != null) {
-					debugprintln("Decimal maximum = "
-							+ testfield.getDecimalMaximum());
 					checkMaximum(testfieldname,
 							new BigInteger(extraparams.get(testfieldname)),
 							testfield.getDecimalMaximum());
 				}
 				if (testfield.getCharacterSet() != null) {
-					debugprintln("Character set = "
-							+ testfield.getCharacterSet());
 					checkWithinCharacterSet(testfieldname,
 							extraparams.get(testfieldname),
 							testfield.getCharacterSet());
@@ -1757,13 +1752,13 @@ public class TDTEngine {
 	 */
 	public String bin2dec(String binary) {
 
-		debugprintln("[line " + getLineNumber() + "] binary = " + binary);
+		//debugprintln("[line " + getLineNumber() + "] binary = " + binary);
 		if (binary.length() == 0) {
 			return "0";
 		} else {
-			debugprintln("Converting binary to decimal");
+			//debugprintln("Converting binary to decimal");
 			BigInteger dec = new BigInteger(binary, 2);
-			debugprintln("Decimal value = " + dec.toString());
+			//debugprintln("Decimal value = " + dec.toString());
 			return dec.toString();
 		}
 	}
@@ -1778,12 +1773,31 @@ public class TDTEngine {
 			decimal = "1";
 		}
 
-		debugprintln("[line " + getLineNumber() + "] decimal = " + decimal);
+		//debugprintln("[line " + getLineNumber() + "] decimal = " + decimal);
 		if (decimal.length() == 0) {
 			return "0";
 		} else {
 			BigInteger bin = new BigInteger(decimal);
 			return bin.toString(2);
+		}
+	}
+	
+	/**
+	 * 
+	 * Converts a large integer (numeric string) to a binary string
+	 */
+	public String dec2hex(String decimal) {
+		// TODO: required?
+		if (decimal == null) {
+			decimal = "0";
+		}
+
+		//debugprintln("[line " + getLineNumber() + "] decimal = " + decimal);
+		if (decimal.length() == 0) {
+			return "0";
+		} else {
+			BigInteger integer = new BigInteger(decimal);
+			return integer.toString(16).toUpperCase();
 		}
 	}
 
@@ -1908,7 +1922,7 @@ public class TDTEngine {
 	public String hex2bin(String hex) {
 		int lenhex = hex.length();
 
-		debugprintln("[line " + getLineNumber() + "] hex = " + hex);
+		//debugprintln("[line " + getLineNumber() + "] hex = " + hex);
 		if (hex.length() == 0) {
 			return "";
 		} else {
@@ -1935,7 +1949,7 @@ public class TDTEngine {
 		int lenbin = binary.length();
 		int lenhex = ((lenbin + 3) / 4);
 
-		debugprintln("[line " + getLineNumber() + "] binary = " + binary);
+		//debugprintln("[line " + getLineNumber() + "] binary = " + binary);
 		if (binary.length() == 0) {
 			return "";
 		} else {
@@ -1967,21 +1981,23 @@ public class TDTEngine {
 			} else {
 				if ((outboundlevel == LevelTypeList.TAG_ENCODING)
 						|| (outboundlevel == LevelTypeList.PURE_IDENTITY)) {
-
 					formattedparam = uriescape(extraparams.get(fields[i]));
+					/*
 					debugprintln("[line " + getLineNumber() + "] param = "
 							+ extraparams.get(fields[i]));
 					debugprintln("[line " + getLineNumber()
 							+ "] formattedparam = " + formattedparam);
-
+					*/
 				} else {
 					formattedparam = extraparams.get(fields[i]);
 				}
 			}
 
 			outboundstring.append(formattedparam);
+			/*
 			debugprintln("buildGrammar appending outboundstring with "
 					+ formattedparam);
+			*/
 		}
 
 		debugprintln("buildGrammar outboundstring = "
@@ -2053,17 +2069,17 @@ public class TDTEngine {
 				+ value);
 		if (bitPadDir != null) {
 			if (bitPadDir == PadDirectionList.RIGHT) {
-				debugprintln("Line 1563 (padField), bitPadDir = RIGHT");
+				//debugprintln("Line 1563 (padField), bitPadDir = RIGHT");
 			} else {
-				debugprintln("Line 1565 (padField), bitPadDir = LEFT");
+				//debugprintln("Line 1565 (padField), bitPadDir = LEFT");
 			}
 		}
 
 		if (padDir != null) {
 			if (padDir == PadDirectionList.RIGHT) {
-				debugprintln("Line 1571 (padField), padDir = RIGHT");
+				//debugprintln("Line 1571 (padField), padDir = RIGHT");
 			} else {
-				debugprintln("Line 1573 (padField), padDir = LEFT");
+				//debugprintln("Line 1573 (padField), padDir = LEFT");
 			}
 		}
 
@@ -2091,10 +2107,10 @@ public class TDTEngine {
 				&& (padCharString != null) && (requiredLength >= 0)) {
 			paddedvalue = applyPadChar(value, padDir, padCharString,
 					requiredLength);
-			debugprintln("Line 1600 (padField), paddedvalue = " + paddedvalue);
+			//debugprintln("Line 1600 (padField), paddedvalue = " + paddedvalue);
 		} else {
 			paddedvalue = value;
-			debugprintln("Line 1603 (padField), No need for padding");
+			//debugprintln("Line 1603 (padField), No need for padding");
 		}
 
 		if (requiredLength != value.length()) {
@@ -2122,7 +2138,7 @@ public class TDTEngine {
 		String binarypaddedvalue;
 
 		String binaryValue = fieldToBinary(tdtfield, extraparams);
-		debugprintln("binarypadding: binaryValue = " + binaryValue);
+		//debugprintln("binarypadding: binaryValue = " + binaryValue);
 
 		if (binaryValue.length() < reqbitlength) {
 
@@ -2159,7 +2175,7 @@ public class TDTEngine {
 			binarypaddedvalue = "";
 		}
 
-		debugprintln("binarypadding: binarypaddedalue = " + binarypaddedvalue);
+		//debugprintln("binarypadding: binarypaddedalue = " + binarypaddedvalue);
 
 		extraparams.put(fieldname, binarypaddedvalue);
 	}
@@ -2285,7 +2301,7 @@ public class TDTEngine {
 		String[] parameter = params.split(",");
 		String newfieldname = tdtrule.getNewFieldName();
 
-		debugprintln("Rule: newfieldname = " + newfieldname);
+		//debugprintln("Rule: newfieldname = " + newfieldname);
 		debugprintln(tdtfunction + " " + parameter[0] + " "
 				+ extraparams.get(parameter[0]));
 		/**
@@ -2322,7 +2338,7 @@ public class TDTEngine {
 				assert t != null : "gs1cpi[" + s + "] is null";
 				assert newfieldname != null;
 				extraparams.put(newfieldname, t);
-				debugprintln("Rule result: " + newfieldname + " = " + t);
+				//debugprintln("Rule result: " + newfieldname + " = " + t);
 				// extraparams.put(newfieldname,
 				// gs1cpi.get(extraparams.get(parameter[0])));
 			} else { // JPB! the following is untested
