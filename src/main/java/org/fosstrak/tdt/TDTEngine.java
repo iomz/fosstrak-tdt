@@ -90,7 +90,7 @@ public class TDTEngine {
 	// - Class/Member Variables -/
 	// --------------------------/
 
-	final Boolean showdebug = true; // if true, print any debug messages;
+	final Boolean showdebug = false; // if true, print any debug messages;
 
 	/**
 	 * prefix_tree_map is a map of levels to prefix trees. Each prefix tree is a
@@ -940,18 +940,19 @@ public class TDTEngine {
 		debugprintln("[line " + getLineNumber() + "] ISO tag detected");
 		String isoUrn = "urn:oid:";
 		String parsed6Hex = parse6HexIso(input, tagLength);
-		//String head = parse6Hex.substring(0, 2);
-		//String isoStandard = isomap.get(head);
 		String hexAfi = dec2hex(afi);
 		String isoStandard = afimap.get(hexAfi);
 		debugprintln("afi: " + hexAfi);
 		debugprintln("iso standard: " + isoStandard.substring(0, isoStandard.length()-1));
 		debugprintln("6bit-encoding id: " + parsed6Hex);
 		if (!isoStandard.isEmpty()) {
-			//isoUrn = isoUrn + isomap.get(head);
+			if (isoStandard.equals(afimap.get("A2"))) {
+				String head = parsed6Hex.substring(0, 2);
+				isoStandard = isomap.get(head);
+			}
 			isoUrn = isoUrn + isoStandard;
-			//isoUrn = isoUrn + parse6Hex.substring(2, parse6Hex.length());
-			isoUrn = isoUrn + parsed6Hex;
+			isoUrn = isoUrn + parsed6Hex.substring(2, parsed6Hex.length());
+			//isoUrn = isoUrn + parsed6Hex;
 			isoUrn = isoUrn.trim();
 		} else
 			isoUrn = null;
